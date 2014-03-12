@@ -96,7 +96,7 @@ local KL = Arena.theKits
 
   for p=1,#Arena.playerList do
     for k=1, (#Arena.theKits[Arena.kitToUse])-1 do
-      rust.RunServerCommand('inv.giveplayer "'.. PL[p].displayName .. '" "' .. KL[k+1][2] .. '" "' .. KL[l+1][1] .. '"')
+      rust.RunServerCommand('inv.giveplayer "'.. PL[p].displayName .. '" "' .. KL[k+1][2] .. '" "' .. KL[k+1][1] .. '"')
     end
   end
 end
