@@ -65,7 +65,7 @@ function PLUGIN:arenaOFF( netuser )
 end
 
 function PLUGIN:arenaPort( netuser )
-   if (Arena.isOn== true && Arena.playing== false) then
+   if (Arena.isOn== true and Arena.playing== false) then
      Arena:clearInventory(netuser)
      local coords = netuser.playerClient.lastKnownPosition
      coords.x = 3440.619628903 --Xcoordinates arena
