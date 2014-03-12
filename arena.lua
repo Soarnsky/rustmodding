@@ -47,9 +47,9 @@ function PLUGIN:arenaON( netuser )
             Arena:givePlayerKits()
             message = "FIGHT !!!"
             rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-         end
-      end
-   end
+         end)
+      end)
+   end)
    return
 end
 
