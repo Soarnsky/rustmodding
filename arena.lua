@@ -91,8 +91,8 @@ end
 function PLUGIN:givePlayerKits()
   -- give each netuser a kit 
   -- PLUGIN.theKits[1] = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
-  for p=1,table.getn(Arena.playerList) do
-    for k=1, table.getn(Arena.theKits[Arena.kitToUse])-1 do
+  for p=1,#Arena.playerList do
+    for k=1, (#Arena.theKits[Arena.kitToUse])-1 do
       rust.RunServerCommand('inv.giveplayer "'.. p.displayName .. '" "' .. k[k+1][2] .. '" "' .. k[l+1][1] .. '"')
     end
   end
@@ -105,8 +105,9 @@ function PLUGIN:Coord( netuser )
 end
 
 function PLUGIN:displayArena( netuser )
+  rust.SendChatToUser( netuser, Arena.getn(Arena.playerlist))
 	for i, player in ipairs(Arena.playerList) do
-		print(Arena.playerList[i])
+		rust.SendChatToUser( netuser, Arena.playerList[i].displayName)
 	end
 end
 
