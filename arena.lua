@@ -41,7 +41,7 @@ end
 function PLUGIN:arenaOFF( netuser )
   if ( not(netuser:CanAdmin()) ) then
     rust.Notice( netuser, "Only admins can do this!" )
-  elseif ( not(Arena.isOn) )
+  elseif ( not(Arena.isOn) ) then
     rust.Notice( netuser, "No Arena instance")
   else
     Arena.isOn= false
