@@ -47,6 +47,7 @@ function PLUGIN:arenaOFF( netuser )
     Arena.isOn= false
     message = "Arena is closed!"
     rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+  end
   return
 end
 
