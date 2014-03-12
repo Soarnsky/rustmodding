@@ -106,7 +106,7 @@ end
 
 function PLUGIN:displayArena( netuser )
 	for i, player in ipairs(Arena.playerList) do
-		print(playerList[i])
+		print(Arena.playerList[i])
 	end
 end
 
