@@ -92,7 +92,7 @@ function PLUGIN:givePlayerKits()
   -- give each netuser a kit 
   -- PLUGIN.theKits[1] = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
 local PL = Arena.playerList
-local KL = Arena.theKits
+local KL = Arena.theKits[Arena.kitToUse]
 
   for p=1,#Arena.playerList do
     for k=1, (#Arena.theKits[Arena.kitToUse])-1 do
