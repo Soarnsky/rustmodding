@@ -95,10 +95,12 @@ function PLUGIN:givePlayerKits()
   -- PLUGIN.theKits[1] = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
 local PL = Arena.playerList
 local KL = Arena.theKits[Arena.kitToUse]
-
+  print(KL)
   for p=1,#Arena.playerList do
     for k=1, (#Arena.theKits[Arena.kitToUse])-1 do
-      rust.SendChatToUser( PL[p], (#Arena.theKits[Arena.kitToUse])-1 )
+        print((#Arena.theKits[Arena.kitToUse])-1 )
+        print(PL[p].displayName)
+        print(KL[k+1][2])
       	--rust.RunServerCommand("inv.giveplayer ".. PL[p].displayName .. " " .. KL[k+1][2] .. " " .. KL[k+1][1])
         rust.RunServerCommand('inv.giveplayer "'.. PL[p].displayName .. '" "' .. KL[k+1][2] .. '" "' .. KL[k+1][1] .. '"')
     end
@@ -128,6 +130,8 @@ end
 -- Called when the server is initialized
 function PLUGIN:OnServerInitialized()
 	print(Arena.Title .. " v" .. Arena.Version .. " loaded!")
+	print(Arena.theKits)
+	print(Arena.theKits[kitToUse])
 end
 
 
