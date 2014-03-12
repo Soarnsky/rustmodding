@@ -82,7 +82,7 @@ end
 function PLUGIN:clearInventory( netuser )
   local inv = rust.GetInventory(netuser)
   if (not inv) then return end
-  for i=1,40 do
+  for i=0,39 do
     local b, item = inv:GetItem(i)
     if (b) then inv:RemoveItem(item) end
   end
