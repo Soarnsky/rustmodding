@@ -86,14 +86,17 @@ function PLUGIN:clearInventory( netuser )
     local b, item = inv:GetItem(i)
     if (b) then inv:RemoveItem(item) end
   end
-end
+end 
 
 function PLUGIN:givePlayerKits()
   -- give each netuser a kit 
   -- PLUGIN.theKits[1] = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
+local PL = Arena.playerList
+local KL = Arena.theKits
+
   for p=1,#Arena.playerList do
     for k=1, (#Arena.theKits[Arena.kitToUse])-1 do
-      rust.RunServerCommand('inv.giveplayer "'.. p.displayName .. '" "' .. k[k+1][2] .. '" "' .. k[l+1][1] .. '"')
+      rust.RunServerCommand('inv.giveplayer "'.. PL[p].displayName .. '" "' .. KL[k+1][2] .. '" "' .. KL[l+1][1] .. '"')
     end
   end
 end
@@ -105,7 +108,7 @@ function PLUGIN:Coord( netuser )
 end
 
 function PLUGIN:displayArena( netuser )
-  rust.SendChatToUser( netuser, Arena.getn(Arena.playerlist))
+  rust.SendChatToUser( netuser, #Arena.playerList .. " participant(s):" )
 	for i, player in ipairs(Arena.playerList) do
 		rust.SendChatToUser( netuser, Arena.playerList[i].displayName)
 	end
