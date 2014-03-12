@@ -38,10 +38,10 @@ function PLUGIN:arenaON( netuser )
    timer.Once(10, function()
       message = "Arena will start in 2 mins !"
       rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-      timer.Once(60, function()
+      timer.Once(10, function()
       	 message = "Arena will start in 1 min !"
          rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-         timer.Once(60, function()
+         timer.Once(10, function()
             -- start the game
             Arena.playing = true
             Arena:givePlayerKits()
