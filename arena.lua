@@ -35,14 +35,16 @@ function PLUGIN:arenaON( netuser )
    Arena.playerList = {}
    message = "Arena open! Type /join to join ( BEWARE -- your inventory will be cleared )"
    rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-   timer.Once(10, function()
+   timer.Once(15, function()
       message = "Arena will start in 2 mins !"
       rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-      timer.Once(10, function()
+      timer.Once(15, function()
       	 message = "Arena will start in 1 min !"
          rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-         timer.Once(10, function()
+         timer.Once(15, function()
             -- start the game
+            message = "Handing out your weapons..."
+            rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
             Arena.playing = true
             Arena:givePlayerKits()
             message = "FIGHT !!!"
