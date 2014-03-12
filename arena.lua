@@ -55,7 +55,7 @@ function PLUGIN:arenaPort( netuser )
      coords.y = 353.20803833008 --Ycoordinates arena
      coords.z = 1167.337890625 --Zcoordinates arena
      rust.ServerManagement():TeleportPlayer(netuser.playerClient.netPlayer, coords)
-	 table.insert( Arena:playerList, netuser )
+	 table.insert( Arena.playerList, netuser )
    else
      rust.Notice(netuser, "Arena is closed!")
    end
