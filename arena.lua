@@ -14,52 +14,55 @@ PLUGIN.theKits[3] = { "Millitary" , { 199, "9mm Ammo"}, { 1, "MP54A"}, { 5, "Lar
 
 -- Initializes the plugin
 function PLUGIN:Init()
-   Arena = self
-   Arena.isOn = false
-   Arena:AddChatCommand( "startarena", Arena.arenaON )
-   Arena:AddChatCommand( "stoparena", Arena.arenaOFF )
-   Arena:AddChatCommand( "join", Arena.arenaPort )
-   Arena:AddChatCommand( "coord", Arena.Coord )
-   Arena:AddChatCommand( "arena", Arena.displayArena )
-   Arena:AddChatCommand( "ahelp", Arena.AHELP )
+  Arena = self
+  Arena.isOn = false
+  Arena:AddChatCommand( "startarena", Arena.arenaON )
+  Arena:AddChatCommand( "stoparena", Arena.arenaOFF )
+  Arena:AddChatCommand( "join", Arena.arenaPort )
+  Arena:AddChatCommand( "coord", Arena.Coord )
+  Arena:AddChatCommand( "arena", Arena.displayArena )
+  Arena:AddChatCommand( "ahelp", Arena.AHELP )
 end
 
 function PLUGIN:arenaON( netuser )
-   if ( not(netuser:CanAdmin()) ) then
-  rust.Notice( netuser, "Only admins can do this!" )
-  return
+  if ( not(netuser:CanAdmin()) ) then
+    rust.Notice( netuser, "Only admins can do this!" )
+  elseif (Arena.isOn) then
+    rust.Notice( netuser, "There is already an Arena in session!")
+  else
+    Arena.isOn= true
+    Arena.playerList = {}
+    message = "Arena open! Type /join to join ( BEWARE -- your inventory will be cleared )"
+    rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
   end
-   Arena.isOn= true
-   Arena.playerList = {}
-   message = "Arena open! Type /join to join ( BEWARE -- your inventory will be cleared )"
-   rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-   return
+  return
 end
 
 function PLUGIN:arenaOFF( netuser )
-   if ( not(netuser:CanAdmin()) ) then
-  rust.Notice( netuser, "Only admins can do this!" )
+  if ( not(netuser:CanAdmin()) ) then
+    rust.Notice( netuser, "Only admins can do this!" )
+  elseif ( not(Arena.isOn) )
+    rust.Notice( netuser, "No Arena instance")
+  else
+    Arena.isOn= false
+    message = "Arena is closed!"
+    rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
   return
-  end
-   Arena.isOn= false
-   message = "Arena is closed!"
-   rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-   return
 end
 
 function PLUGIN:arenaPort( netuser )
-   if (Arena.isOn== true) then
-     Arena:clearInventory(netuser)
-     local coords = netuser.playerClient.lastKnownPosition
-     coords.x = 3440.619628903 --Xcoordinates arena
-     coords.y = 353.20803833008 --Ycoordinates arena
-     coords.z = 1167.337890625 --Zcoordinates arena
-     rust.ServerManagement():TeleportPlayer(netuser.playerClient.netPlayer, coords)
-	 table.insert( Arena.playerList, netuser )
-   else
-     rust.Notice(netuser, "Arena is closed!")
-   end
-   return
+  if (Arena.isOn== true) then
+    Arena:clearInventory(netuser)
+    local coords = netuser.playerClient.lastKnownPosition
+    coords.x = 3440.619628903 --Xcoordinates arena
+    coords.y = 353.20803833008 --Ycoordinates arena
+    coords.z = 1167.337890625 --Zcoordinates arena
+    rust.ServerManagement():TeleportPlayer(netuser.playerClient.netPlayer, coords)
+	  table.insert( Arena.playerList, netuser )
+  else
+    rust.Notice(netuser, "Arena is closed!")
+  end
+  return
 end
 
 function PLUGIN:clearInventory( netuser )
