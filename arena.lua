@@ -6,6 +6,12 @@ PLUGIN.Version         = "1.0 Alpha"
 PLUGIN.playerList	= {}
 PLUGIN.isOn 		= false
 
+PLUGIN.kitToUse = 1
+PLUGIN.theKits = {}
+PLUGIN.theKits[1] = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
+PLUGIN.theKits[2] = { "Bows" , { 50, "Arrow"}, { 1, "Hunting Bow"}, { 1, "Large Medkit"} }
+PLUGIN.theKits[3] = { "Millitary" , { 199, "9mm Ammo"}, { 1, "MP54A"}, { 5, "Large Medkit"}, { 2, "F1 Grenade"}, { 1, "Kevlar Vest"} }
+
 -- Initializes the plugin
 function PLUGIN:Init()
    Arena = self
