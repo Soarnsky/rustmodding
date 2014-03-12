@@ -6,6 +6,8 @@ PLUGIN.Version         = "1.0 Alpha"
 PLUGIN.playerList	= {}
 PLUGIN.isOn 		= false
 
+PLUGIN.playing		= false
+
 PLUGIN.kitToUse = 1
 PLUGIN.theKits = {}
 PLUGIN.theKits[1] = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
@@ -33,6 +35,18 @@ function PLUGIN:arenaON( netuser )
    Arena.playerList = {}
    message = "Arena open! Type /join to join ( BEWARE -- your inventory will be cleared )"
    rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+   timer.Once(10, function()
+      message = "Arena will start in 2 mins !"
+      rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+      timer.Once(60, function()
+      	 message = "Arena will start in 1 min !"
+         rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+         timer.Once(60, function()
+            -- start the game
+            Arena.playing = true
+            Arena:givePlayerKits()
+            message = "FIGHT !!!"
+            rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
    return
 end
 
@@ -48,7 +62,7 @@ function PLUGIN:arenaOFF( netuser )
 end
 
 function PLUGIN:arenaPort( netuser )
-   if (Arena.isOn== true) then
+   if (Arena.isOn== true && Arena.playing== false) then
      Arena:clearInventory(netuser)
      local coords = netuser.playerClient.lastKnownPosition
      coords.x = 3440.619628903 --Xcoordinates arena
