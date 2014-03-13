@@ -1,7 +1,7 @@
 PLUGIN.Title           = "Arena"
 PLUGIN.Description     = ""
 PLUGIN.Author          = "Kitboga, Soarnsky"
-PLUGIN.Version         = "1.0 Alpha"
+PLUGIN.Version         = "1.11 Alpha"
 
 PLUGIN.playerList      = {}
 PLUGIN.alivePlayers    = {}
@@ -17,39 +17,50 @@ PLUGIN.theKits[3]      = { "Millitary" , { 199, "9mm Ammo"}, { 1, "MP54A"}, { 5,
 -- Initializes the plugin
 function PLUGIN:Init()
     Arena = self
+    Arena.LoadConfig()
     Arena.isOn = false
-    Arena:AddChatCommand( "startarena", Arena.arenaON )
-    Arena:AddChatCommand( "stoparena", Arena.arenaOFF )
-    Arena:AddChatCommand( "join", Arena.arenaPort )
-    Arena:AddChatCommand( "coord", Arena.Coord )
-    Arena:AddChatCommand( "arena", Arena.displayArena )
-    Arena:AddChatCommand( "ahelp", Arena.AHELP )
+    Arena:AddChatCommand( "startarena", Arena.cmdStartArena )
+    Arena:AddChatCommand( "stoparena", Arena.cmdStopArena )
+    Arena:AddChatCommand( "join", Arena.cmdJoin )
+    Arena:AddChatCommand( "coord", Arena.cmdCoord )
+    Arena:AddChatCommand( "arena", Arena.cmdArena )
+    Arena:AddChatCommand( "ahelp", Arena.cmdAHELP )
 end
 
-function PLUGIN:arenaON( netuser )
+function PLUGIN:LoadConfig()
+    local b, res = config.Read("arena")
+    self.Config = res or {}
+    if (not b) then
+        self:LoadDefaultConfig()
+        if (res) then config.Save("arena") end
+    end
+end
+
+function PLUGIN:cmdStartArena( netuser )
     if ( not(netuser:CanAdmin()) ) then
         rust.Notice( netuser, "Only admins can do this!" )
     else
         Arena.isOn= true
         Arena.playerList = {}
-        message = "Arena open! Type /join to join ( BEWARE -- your inventory will be cleared )"
+        message = "Arena starts in" .. Arena.Config.startDelay/60 .. "mins! Type /join to join ( BEWARE -- your inventory will be cleared )"
         rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+        --Timer is split equally into 3 parts
         --First notification
-        timer.Once(15, function()
-        message = "Arena will start in 2 mins !"
+        timer.Once(Arena.Config.startDelay/3, function()
+        message = "Arena will start in" ..((Arena.Config.startDelay/60)/3)*2.. " mins !"
         rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
         --Second notification
-        timer.Once(15, function()
-      	message = "Arena will start in 1 min !"
+        timer.Once((Arena.Config.startDelay/3)-Arena.Config.setupDelay, function()
+      	message = "Arena will start in" ..(Arena.Config.startDelay/60)/3.. " mins !"
         rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
         --Distribute kits
-        timer.Once(15, function()       
+        timer.Once(Arena.Config.setupDelay/2, function()       
         message = "Handing out your weapons..."
         rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
         Arena.playing = true
         Arena:givePlayerKits()
         --Start the arena
-        timer.Once(15, function()
+        timer.Once(Arena.Config.setupDelay/2, function()
         message = "FIGHT !!!"
         rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
         end) end) end) end)
@@ -57,7 +68,7 @@ function PLUGIN:arenaON( netuser )
     return
 end
 
-function PLUGIN:arenaOFF( netuser )
+function PLUGIN:cmdStopArena( netuser )
     if ( not(netuser:CanAdmin()) ) then
         rust.Notice( netuser, "Only admins can do this!" )
     else
@@ -69,13 +80,13 @@ function PLUGIN:arenaOFF( netuser )
     return
 end
 
-function PLUGIN:arenaPort( netuser )
+function PLUGIN:cmdJoin( netuser )
     if (Arena.isOn== true and Arena.playing== false) then
         Arena:clearInventory(netuser)
         local coords = netuser.playerClient.lastKnownPosition
-        coords.x = 3440.619628903 --Xcoordinates arena
-        coords.y = 353.20803833008 --Ycoordinates arena
-        coords.z = 1167.337890625 --Zcoordinates arena
+        coords.x = Arena.Config.arenaX --Xcoordinates arena
+        coords.y = Arena.Config.arenaY --Ycoordinates arena
+        coords.z = Arena.Config.arenaZ --Zcoordinates arena
         rust.ServerManagement():TeleportPlayer(netuser.playerClient.netPlayer, coords)
 	      table.insert( Arena.playerList, netuser )
 	      table.insert( Arena.alivePlayers, netuser )
@@ -109,19 +120,19 @@ function PLUGIN:givePlayerKits()
 end
      
 
-function PLUGIN:Coord( netuser )
+function PLUGIN:cmdCoord( netuser )
     local coords = netuser.playerClient.lastKnownPosition
     rust.SendChatToUser( netuser, "Current Position: {x: " .. coords.x .. ", y: " .. coords.y .. ", z: " .. coords.z .. "}")
 end
 
-function PLUGIN:displayArena( netuser )
+function PLUGIN:cmdArena( netuser )
     rust.SendChatToUser( netuser, #Arena.playerList .. " participant(s):" )
 	  for i, player in ipairs(Arena.playerList) do
 		    rust.SendChatToUser( netuser, Arena.playerList[i].displayName)
 	  end
 end
 
-function PLUGIN:AHELP( netuser )
+function PLUGIN:cmdAHELP( netuser )
 	  rust.SendChatToUser( netuser, "Use /join to tp to the Arena if it is open, /coord to check location" )
     if (netuser:CanAdmin()) then
         rust.SendChatToUser( netuser, "Use /startarena and /stoparena to activate/deactivate arena" )
@@ -174,13 +185,13 @@ function PLUGIN:OnKilled( target, dmg )
                     timer.Once(15, function()
                     message = "Arena Winner: " .. playerattacker
                     rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-                    Arena:arenaOFF()
+                    Arena:cmdStopArena()
                     end)
                 elseif(#Arena.alivePlayers == 0) then
                     timer.Once(15, function()
                     message = "Arena Finished (everyone died)"
                     rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-                    Arena:arenaOFF()
+                    Arena:cmdStopArena()
                     end)
                 end
             end
@@ -190,4 +201,12 @@ end
 
 function PLUGIN:SendHelpText( netuser )
     rust.SendChatToUser( netuser, "Use /ahelp to see Arena commands" )
+end
+
+function PLUGIN:LoadDefaultConfig()
+    Arena.Config.startDelay = 300
+    Arena.Config.setupDelay = 30
+    Arena.Config.arenaX = 3440.619628903
+    Arena.Config.arenaY = 353.20803833008
+    Arena.Config.arenaZ = 1167.337890625
 end
