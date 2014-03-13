@@ -3,16 +3,16 @@ PLUGIN.Description     = ""
 PLUGIN.Author          = "Kitboga, Soarnsky"
 PLUGIN.Version         = "1.0 Alpha"
 
-PLUGIN.playerList	= {}
-PLUGIN.alivePlayers     = {}
-PLUGIN.isOn 		= false
-PLUGIN.playing		= false
+PLUGIN.playerList      = {}
+PLUGIN.alivePlayers    = {}
+PLUGIN.isOn            = false
+PLUGIN.playing         = false
 
-PLUGIN.kitToUse = 1
-PLUGIN.theKits = {}
-PLUGIN.theKits[1] = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
-PLUGIN.theKits[2] = { "Bows" , { 50, "Arrow"}, { 1, "Hunting Bow"}, { 1, "Large Medkit"} }
-PLUGIN.theKits[3] = { "Millitary" , { 199, "9mm Ammo"}, { 1, "MP54A"}, { 5, "Large Medkit"}, { 2, "F1 Grenade"}, { 1, "Kevlar Vest"} }
+PLUGIN.kitToUse        = 1
+PLUGIN.theKits         = {}
+PLUGIN.theKits[1]      = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
+PLUGIN.theKits[2]      = { "Bows" , { 50, "Arrow"}, { 1, "Hunting Bow"}, { 1, "Large Medkit"} }
+PLUGIN.theKits[3]      = { "Millitary" , { 199, "9mm Ammo"}, { 1, "MP54A"}, { 5, "Large Medkit"}, { 2, "F1 Grenade"}, { 1, "Kevlar Vest"} }
 
 -- Initializes the plugin
 function PLUGIN:Init()
@@ -159,8 +159,8 @@ end
 function PLUGIN:OnKilled( target, dmg )
     if(Arena.isOn== true and Arena.playing== true) then
         if(dmg.attacker and dmg.attacker.client ) then
-            -- local player = dmg.attacker.client.netUser
-	          -- local playerattacker = player.displayName
+            local player = dmg.attacker.client.netUser
+	          local playerattacker = player.displayName
 	          local component = target:GetComponent("HumanController")
 	          if(not component) then return end
 	          local victim = rust.NetUserFromNetPlayer(component.networkViewOwner)
