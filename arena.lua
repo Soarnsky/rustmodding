@@ -160,29 +160,29 @@ function PLUGIN:OnKilled( target, dmg )
     if(Arena.isOn== true and Arena.playing== true) then
         if(dmg.attacker and dmg.attacker.client ) then
             local player = dmg.attacker.client.netUser
-	          local playerattacker = player.displayName
-	          local component = target:GetComponent("HumanController")
-	          if(not component) then return end
-	          local victim = rust.NetUserFromNetPlayer(component.networkViewOwner)
-	          -- check to see if the victim is part of the arena match
-	          if( Arena:containsVal(Arena.playerList, victim)) then
-	              -- the player was killed in the arena so remove him from the aliveplayers array
-	              Arena:removeVal(Arena.alivePlayers, victim)
-	              rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.playerName)
-	              if(#Arena.alivePlayers == 1) then
-	                  timer.Once(15, function()
+            local playerattacker = player.displayName
+            local component = target:GetComponent("HumanController")
+            if(not component) then return end
+            local victim = rust.NetUserFromNetPlayer(component.networkViewOwner)
+            -- check to see if the victim is part of the arena match
+            if( Arena:containsVal(Arena.playerList, victim)) then
+                -- the player was killed in the arena so remove him from the aliveplayers array
+                Arena:removeVal(Arena.alivePlayers, victim)
+                rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.playerName)
+                if(#Arena.alivePlayers == 1) then
+                    timer.Once(15, function()
                     message = "Arena Winner: " .. playerattacker
                     rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
                     Arena:arenaOFF()
                     end)
                 elseif(#Arena.alivePlayers == 0) then
-    	              timer.Once(15, function()
+                    timer.Once(15, function()
                     message = "Arena Finished (everyone died)"
                     rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
                     Arena:arenaOFF()
                     end)
-    	          end
-	          end
+                end
+            end
         end
     end
 end
