@@ -4,8 +4,8 @@ PLUGIN.Author          = "Kitboga, Soarnsky"
 PLUGIN.Version         = "1.0 Alpha"
 
 PLUGIN.playerList	= {}
+PLUGIN.alivePlayers     = {}
 PLUGIN.isOn 		= false
-
 PLUGIN.playing		= false
 
 PLUGIN.kitToUse = 1
@@ -47,8 +47,10 @@ function PLUGIN:arenaON( netuser )
             rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
             Arena.playing = true
             Arena:givePlayerKits()
-            message = "FIGHT !!!"
-            rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+            timer.Once(15, function()
+               message = "FIGHT !!!"
+               rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+            end)
          end)
       end)
    end)
@@ -61,6 +63,7 @@ function PLUGIN:arenaOFF( netuser )
   return
   end
    Arena.isOn= false
+   Arena.playing = false
    message = "Arena is closed!"
    rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
    return
@@ -75,6 +78,7 @@ function PLUGIN:arenaPort( netuser )
      coords.z = 1167.337890625 --Zcoordinates arena
      rust.ServerManagement():TeleportPlayer(netuser.playerClient.netPlayer, coords)
 	 table.insert( Arena.playerList, netuser )
+	 table.insert( Arena.alivePlayers, netuser )
    else
      rust.Notice(netuser, "Arena is closed!")
    end
@@ -134,6 +138,65 @@ function PLUGIN:OnServerInitialized()
 	print(Arena.theKits[kitToUse])
 end
 
+-- Tests if a value is contained in a table
+function PLUGIN:containsVal(t, val)
+	for _,v in ipairs(t) do
+		if (v == val) then
+			return true
+		end
+	end
+	return false
+end
+
+-- Removes a value from an array
+function PLUGIN:removeVal(t, val)
+	for i,v in ipairs(t) do
+		if (v == val) then
+			table.remove(t, i)
+			rust.BroadcastChat("Arena", val.displayName .. " died in the arena...")
+			return true
+		end
+	end
+
+	return false
+end
+
+-- called when someone is killed
+function PLUGIN:OnKilled( target, dmg )
+   if(Arena.isOn== true and Arena.playing== true)
+   then
+      if(dmg.attacker and dmg.attacker.client )
+         -- local player = dmg.attacker.client.netUser
+	 -- local playerattacker = player.displayName
+	 local component = target:GetComponent("HumanController")
+	 if (not component) then return end
+	 local victim = rust.NetUserFromNetPlayer(component.networkViewOwner)
+	 -- check to see if the victim is part of the arena match
+	 if( Arena:containsVal(Arena.playerList, victim)
+	 then
+	    -- the player was killed in the arena so remove him from the aliveplayers array
+	    Arena:removeVal(Arena.alivePlayers, victim)
+	    rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.playerName)
+	    if(#Arena.alivePlayers == 1)
+	    then
+	      timer.Once(15, function()
+               message = "Arena Winner: " .. playerattacker
+               rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+               Arena:arenaOFF()
+              end)
+	    end
+            elseif(#Arena.alivePlayers == 0)
+    	     then
+    	     timer.Once(15, function()
+               message = "Arena Finished (everyone died)"
+               rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+               Arena:arenaOFF()
+              end)
+    	    end
+	 end
+      end
+   end
+end
 
 function PLUGIN:SendHelpText( netuser )
     rust.SendChatToUser( netuser, "Use /ahelp to see Arena commands" )
