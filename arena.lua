@@ -165,7 +165,7 @@ function PLUGIN:OnKilled( target, dmg )
 	          if(not component) then return end
 	          local victim = rust.NetUserFromNetPlayer(component.networkViewOwner)
 	          -- check to see if the victim is part of the arena match
-	          if( Arena:containsVal(Arena.playerList, victim) then
+	          if( Arena:containsVal(Arena.playerList, victim)) then
 	              -- the player was killed in the arena so remove him from the aliveplayers array
 	              Arena:removeVal(Arena.alivePlayers, victim)
 	              rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.playerName)
