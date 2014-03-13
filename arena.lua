@@ -168,7 +168,8 @@ function PLUGIN:OnKilled( target, dmg )
             if( Arena:containsVal(Arena.playerList, victim)) then
                 -- the player was killed in the arena so remove him from the aliveplayers array
                 Arena:removeVal(Arena.alivePlayers, victim)
-                rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.playerName)
+                -- not working wiith suicide
+                --rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.playerName)
                 if(#Arena.alivePlayers == 1) then
                     timer.Once(15, function()
                     message = "Arena Winner: " .. playerattacker
