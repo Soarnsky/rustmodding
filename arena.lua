@@ -29,9 +29,9 @@ end
 
 function PLUGIN:LoadConfig()
     local b, res = config.Read("arena")
-    self.Config = res or {}
+    Arena.Config = res or {}
     if (not b) then
-        self:LoadDefaultConfig()
+        Arena:LoadDefaultConfig()
         if (res) then config.Save("arena") end
     end
 end
@@ -42,16 +42,20 @@ function PLUGIN:cmdStartArena( netuser )
     else
         Arena.isOn= true
         Arena.playerList = {}
-        message = "Arena starts in" .. Arena.Config.startDelay/60 .. "mins! Type /join to join ( BEWARE -- your inventory will be cleared )"
+        -- message = "Arena starts in" .. Arena.Config.startDelay .. "sec (" .. Arena.Config.startDelay/60 ..
+        --           "min)! Type /join to join ( BEWARE -- your inventory will be cleared )"
+        message = "Arena starts in 2 min"
         rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
         --Timer is split equally into 3 parts
         --First notification
         timer.Once(Arena.Config.startDelay/3, function()
-        message = "Arena will start in" ..((Arena.Config.startDelay/60)/3)*2.. " mins !"
+        --message = "Arena will start in" ..((Arena.Config.startDelay/60)/3)*2.. " mins !"
+        message = "Arena starts in 1 min"
         rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
         --Second notification
         timer.Once((Arena.Config.startDelay/3)-Arena.Config.setupDelay, function()
-      	message = "Arena will start in" ..(Arena.Config.startDelay/60)/3.. " mins !"
+      	--message = "Arena will start in" ..(Arena.Config.startDelay/60)/3.. " mins !"
+        message = "Arena blah mins"
         rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
         --Distribute kits
         timer.Once(Arena.Config.setupDelay/2, function()       
@@ -141,9 +145,15 @@ end
 
 -- Called when the server is initialized
 function PLUGIN:OnServerInitialized()
-	  print(Arena.Title .. " v" .. Arena.Version .. " loaded!")
-	  print(Arena.theKits)
-	  print(Arena.theKits[kitToUse])
+    print(Arena.Title .. " v" .. Arena.Version .. " loaded!")
+	print(Arena.theKits)
+	print(Arena.theKits[kitToUse])
+    print(Arena.Config.startDelay)
+    print(Arena.Config.startDelay/60)
+    print(Arena.Config.startDelay/60/3)
+    print((Arena.Config.startDelay/60)/3)
+    print(Arena.Config.startDelay/60/3*2)
+    print(((Arena.Config.startDelay/60)/3)*2)
 end
 
 -- Tests if a value is contained in a table
@@ -179,8 +189,8 @@ function PLUGIN:OnKilled( target, dmg )
             if( Arena:containsVal(Arena.playerList, victim)) then
                 -- the player was killed in the arena so remove him from the aliveplayers array
                 Arena:removeVal(Arena.alivePlayers, victim)
-                -- not working wiith suicide
-                --rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.playerName)
+                -- not working with suicide
+                rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.playerName)
                 if(#Arena.alivePlayers == 1) then
                     timer.Once(15, function()
                     message = "Arena Winner: " .. playerattacker
@@ -204,8 +214,8 @@ function PLUGIN:SendHelpText( netuser )
 end
 
 function PLUGIN:LoadDefaultConfig()
-    Arena.Config.startDelay = 300
-    Arena.Config.setupDelay = 30
+    Arena.Config.startDelay = 300.00
+    Arena.Config.setupDelay = 30.00
     Arena.Config.arenaX = 3440.619628903
     Arena.Config.arenaY = 353.20803833008
     Arena.Config.arenaZ = 1167.337890625
