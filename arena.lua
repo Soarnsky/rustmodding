@@ -49,14 +49,14 @@ function PLUGIN:cmdStartArena( netuser )
         --Timer is split equally into 3 parts
         --First notification
         timer.Once(Arena.Config.startDelay/3, function()
-        message = "Arena will start in" .. ((Arena.Config.startDelay/60)/3)*2 .. " mins !"
+        message = "Arena will start in" .. (((Arena.Config.startDelay/60)/3)*2) .. " mins !"
         --message = "Arena starts in 1 min"
         if Arena.isOn then 
             rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
         else return end
         --Second notification
         timer.Once((Arena.Config.startDelay/3)-Arena.Config.setupDelay, function()
-      	message = "Arena will start in" ..(Arena.Config.startDelay/60)/3.. " mins !"
+      	message = "Arena will start in" ..((Arena.Config.startDelay/60)/3).. " mins !"
         --message = "Arena blah mins"
         if Arena.isOn then
             rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
