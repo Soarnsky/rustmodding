@@ -219,7 +219,7 @@ end
 function PLUGIN:OnUserDiscconnect(netPlayer)
     if(Arena.isOn== true and Arena.playing== true) then
         local netuser = rust.NetUserFromNetPlayer(netPlayer)
-        if(Arena:containsVal(Arena.playerList, netuser)
+        if(Arena:containsVal(Arena.playerList, netuser))
             then
             Arena:removeVal(Arena.playerList, netuser)
             Arena:removeVal(Arena.alivePlayers, netuser)
