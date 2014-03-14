@@ -147,7 +147,7 @@ function PLUGIN:cmdArena( netuser )
             players = players .. Arena.playerList[i].displayName .. "."
         end
     end
-    rust.SendChatToUser( netuser, Arena.playerList[i].displayName)	  
+    rust.SendChatToUser( netuser, players)	  
 end
 
 function PLUGIN:cmdAHELP( netuser )
@@ -198,7 +198,9 @@ function PLUGIN:OnKilled( target, dmg )
                 Arena:removeVal(Arena.alivePlayers, victim)
                 -- not working with suicide
                 rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.playerName)
-                if(#Arena.alivePlayers == 1) then
+                if(#Arena.alivePlayers ~= 1) then
+                    rust.BroadcastChat("Arena", #Arena.alivePlayers .. " players left in the Arena")
+                elseif(#Arena.alivePlayers == 1) then
                     timer.Once(15, function()
                     message = "Arena Winner: " .. playerattacker
                     rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
