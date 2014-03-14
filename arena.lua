@@ -145,6 +145,10 @@ function PLUGIN:givePlayerKits()
             	then
             	   pref = rust.InventorySlotPreference( InventorySlotKind.Default, false, InventorySlotKindFlags.Belt)
             	end
+            if(string.find(KL[k+1][2], "Helmet") or string.find(KL[k+1][2], "Boots") or string.find(KL[k+1][2], "Pants") or string.find(KL[k+1][2], "Vest")) 
+               then
+            	  pref = rust.InventorySlotPreference( InventorySlotKind.Armor, false, InventorySlotKindFlags.Armor)
+               end
             local amt = KL[k+1][1]
             inv:AddItemAmount( item, amt, pref )
         end
@@ -267,6 +271,7 @@ function PLUGIN:OnKilled( target, dmg )
             if( Arena:containsVal(Arena.playerList, victim)) then
                 -- the player was killed in the arena so remove him from the aliveplayers array
                 Arena:removeVal(Arena.alivePlayers, victim)
+                Arena:clearInventory( victim ) 
                 rust.BroadcastChat("Arena", victim.displayName .. " died in the arena...")
                 -- not working with suicide
                 rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.displayName)
