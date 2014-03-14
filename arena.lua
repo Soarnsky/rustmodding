@@ -216,7 +216,7 @@ function PLUGIN:OnSpawnPlayer( playerClient, useCamp, avatar )
 end
 
 -- if someone were to disconnect we need to remove them from the lists
-function PLUGIN:OnUserDiscconnect(netPlayer)
+function PLUGIN:OnUserDisconnect(netPlayer)
     if(Arena.isOn== true and Arena.playing== true) then
         local netuser = rust.NetUserFromNetPlayer(netPlayer)
         if(Arena:containsVal(Arena.playerList, netuser))
@@ -282,7 +282,11 @@ function PLUGIN:OnKilled( target, dmg )
 		                Arena:clearInventory( player.netUser ) 
                         local originalLocation = Arena.playerOriLoc[player.netUser]
                         rust.ServerManagement():TeleportPlayer(player.netPlayer, originalLocation)
+                        if( Arena:containsVal(Arena.alivePlayers, player.netUser)) then
+                            Arena:removeVal(Arena.alivePlayers, player.netUser)
                         end
+                        Arena:removeVal(Arena.playerList, player.netUser)
+                    end
                     end)
                     Arena:stopArena()
                 elseif(#Arena.alivePlayers == 0) then
