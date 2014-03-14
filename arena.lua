@@ -13,7 +13,7 @@ PLUGIN.kitToUse        = 1
 PLUGIN.theKits         = {}
 PLUGIN.theKits[1]      = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
 PLUGIN.theKits[2]      = { "Bows" , { 50, "Arrow"}, { 1, "Hunting Bow"}, { 1, "Large Medkit"} }
-PLUGIN.theKits[3]      = { "Military" , { 199, "9mm Ammo"}, { 1, "MP54A"}, { 5, "Large Medkit"}, { 1, "Kevlar Vest"} }
+PLUGIN.theKits[3]      = { "Military" , { 199, "9mm Ammo"}, { 1, "MP5A4"}, { 5, "Large Medkit"}, { 1, "Kevlar Vest"} }
 
 -- Initializes the plugin
 function PLUGIN:Init()
