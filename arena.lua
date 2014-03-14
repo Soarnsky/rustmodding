@@ -134,6 +134,7 @@ function PLUGIN:givePlayerKits()
     -- PLUGIN.theKits[1] = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
     local PL = Arena.playerList
     local KL = Arena.theKits[Arena.kitToUse]
+    local inv
     for p=1,#Arena.playerList do
         inv = rust.GetInventory(PL[p])
         for k=1, (#Arena.theKits[Arena.kitToUse])-1 do
@@ -141,6 +142,7 @@ function PLUGIN:givePlayerKits()
             local item = KL[k+2][2]
             local amt = KL[k+2][1]
             inv:AddItemAmount( item, amount, pref )
+
         end
     end
 end
