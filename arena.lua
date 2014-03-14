@@ -138,10 +138,16 @@ function PLUGIN:cmdCoord( netuser )
 end
 
 function PLUGIN:cmdArena( netuser )
+    local players = ""
     rust.SendChatToUser( netuser, #Arena.playerList .. " participant(s):" )
-	  for i, player in ipairs(Arena.playerList) do
-		    rust.SendChatToUser( netuser, Arena.playerList[i].displayName)
-	  end
+	for i in ipairs(Arena.playerList) do
+        if (i%5 ~= 0 and i ~= #Arena.playerList) then
+            players = players .. Arena.playerList[i].displayName .. ", "
+        elseif (i == #Arena.playerList) then
+            players = players .. Arena.playerList[i].displayName .. "."
+        end
+    end
+    rust.SendChatToUser( netuser, Arena.playerList[i].displayName)	  
 end
 
 function PLUGIN:cmdAHELP( netuser )
