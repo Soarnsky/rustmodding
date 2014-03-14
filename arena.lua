@@ -40,33 +40,41 @@ function PLUGIN:cmdStartArena( netuser )
     if ( not(netuser:CanAdmin()) ) then
         rust.Notice( netuser, "Only admins can do this!" )
     else
-        Arena.isOn= true
+        Arena.isOn = true
         Arena.playerList = {}
-        -- message = "Arena starts in" .. Arena.Config.startDelay .. "sec (" .. Arena.Config.startDelay/60 ..
-        --           "min)! Type /join to join ( BEWARE -- your inventory will be cleared )"
-        message = "Arena starts in 2 min"
+        message = "Arena starts in" .. Arena.Config.startDelay .. "sec (" .. Arena.Config.startDelay/60 ..
+                  "min)! Type /join to join ( BEWARE -- your inventory will be cleared )"
+        -- message = "Arena starts in 2 min"
         rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
         --Timer is split equally into 3 parts
         --First notification
         timer.Once(Arena.Config.startDelay/3, function()
-        --message = "Arena will start in" ..((Arena.Config.startDelay/60)/3)*2.. " mins !"
-        message = "Arena starts in 1 min"
-        rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+        message = "Arena will start in" .. ((Arena.Config.startDelay/60)/3)*2 .. " mins !"
+        --message = "Arena starts in 1 min"
+        if Arena.isOn then 
+            rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+        else return end
         --Second notification
         timer.Once((Arena.Config.startDelay/3)-Arena.Config.setupDelay, function()
-      	--message = "Arena will start in" ..(Arena.Config.startDelay/60)/3.. " mins !"
-        message = "Arena blah mins"
-        rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+      	message = "Arena will start in" ..(Arena.Config.startDelay/60)/3.. " mins !"
+        --message = "Arena blah mins"
+        if Arena.isOn then
+            rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+        else return end
         --Distribute kits
         timer.Once(Arena.Config.setupDelay/2, function()       
         message = "Handing out your weapons..."
-        rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+        if Arena.isOn then
+            rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+        else return end
         Arena.playing = true
         Arena:givePlayerKits()
         --Start the arena
         timer.Once(Arena.Config.setupDelay/2, function()
         message = "FIGHT !!!"
-        rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+        if Arena.isOn then
+            rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+        else return end
         end) end) end) end)
     end
     return
@@ -76,7 +84,7 @@ function PLUGIN:cmdStopArena( netuser )
     if ( not(netuser:CanAdmin()) ) then
         rust.Notice( netuser, "Only admins can do this!" )
     else
-        Arena.isOn= false
+        Arena.isOn = false
         Arena.playing = false
         message = "Arena is closed!"
         rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
@@ -85,15 +93,15 @@ function PLUGIN:cmdStopArena( netuser )
 end
 
 function PLUGIN:cmdJoin( netuser )
-    if (Arena.isOn== true and Arena.playing== false) then
+    if (Arena.isOn == true and Arena.playing == false) then
         Arena:clearInventory(netuser)
         local coords = netuser.playerClient.lastKnownPosition
         coords.x = Arena.Config.arenaX --Xcoordinates arena
         coords.y = Arena.Config.arenaY --Ycoordinates arena
         coords.z = Arena.Config.arenaZ --Zcoordinates arena
         rust.ServerManagement():TeleportPlayer(netuser.playerClient.netPlayer, coords)
-	      table.insert( Arena.playerList, netuser )
-	      table.insert( Arena.alivePlayers, netuser )
+        table.insert( Arena.playerList, netuser )
+        table.insert( Arena.alivePlayers, netuser )
     else rust.Notice(netuser, "Arena is closed!") end
     return
 end
@@ -146,14 +154,7 @@ end
 -- Called when the server is initialized
 function PLUGIN:OnServerInitialized()
     print(Arena.Title .. " v" .. Arena.Version .. " loaded!")
-	print(Arena.theKits)
-	print(Arena.theKits[kitToUse])
-    print(Arena.Config.startDelay)
-    print(Arena.Config.startDelay/60)
-    print(Arena.Config.startDelay/60/3)
     print((Arena.Config.startDelay/60)/3)
-    print(Arena.Config.startDelay/60/3*2)
-    print(((Arena.Config.startDelay/60)/3)*2)
 end
 
 -- Tests if a value is contained in a table
