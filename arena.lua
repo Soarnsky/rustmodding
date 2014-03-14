@@ -1,7 +1,7 @@
 PLUGIN.Title           = "Arena"
 PLUGIN.Description     = ""
 PLUGIN.Author          = "Kitboga, Soarnsky"
-PLUGIN.Version         = "1.11 Alpha"
+PLUGIN.Version         = "1.2 Alpha"
 
 PLUGIN.playerList      = {}
 PLUGIN.playerOriLoc    = {}
@@ -108,6 +108,7 @@ function PLUGIN:cmdJoin( netuser )
         local oldCoords = netuser.playerClient.lastKnownPosition
         local newCoords = netuser.playerClient.lastKnownPosition
         -- add to an array to teleport them back later !
+        oldCoords.y = oldCoords.y + 5
         Arena.playerOriLoc[netuser] = oldCoords
         newCoords.x = Arena.Config.arenaX --Xcoordinates arena
         newCoords.y = Arena.Config.arenaY --Ycoordinates arena
@@ -177,22 +178,21 @@ end
 
 -- Tests if a value is contained in a table
 function PLUGIN:containsVal(t, val)
-	  for i,v in ipairs(t) do
-		    if (v == val) then return i end
-	  end
-	  return false
+	for i,v in ipairs(t) do
+		if (v == val) then return i end
+	end
+	return false
 end
 
 -- Removes a value from an array
 function PLUGIN:removeVal(t, val)
     for i,v in ipairs(t) do
-		    if (v == val) then
-			      table.remove(t, i)
-			      rust.BroadcastChat("Arena", val.displayName .. " died in the arena...")
-			      return true
-		    end
-	  end
-	  return false
+		if (v == val) then
+			table.remove(t, i)
+			return true
+		end
+	end
+	return false
 end
 -- called when they first spawn
 function PLUGIN:OnSpawnPlayer( playerClient, useCamp, avatar )
@@ -203,7 +203,8 @@ function PLUGIN:OnSpawnPlayer( playerClient, useCamp, avatar )
         then
             local originalLocation = Arena.playerOriLoc[player]
             rust.ServerManagement():TeleportPlayer(playerClient.netPlayer, originalLocation)
-            originalLocation = nil
+            Arena:removeVal(Arena.playerList, player)
+            Arena:removeVal(Arena.playerOriLoc, player)
         end
     end)
 end
@@ -212,8 +213,8 @@ end
 function PLUGIN:OnKilled( target, dmg )
     if(Arena.isOn== true and Arena.playing== true) then
         if(dmg.attacker and dmg.attacker.client ) then
-            local player = dmg.attacker.client.netUser
-            local playerattacker = player.displayName
+            local player = dmg.attacker.client
+            local playerattacker = player.netUser.displayName
             local component = target:GetComponent("HumanController")
             if(not component) then return end
             local victim = rust.NetUserFromNetPlayer(component.networkViewOwner)
@@ -221,21 +222,22 @@ function PLUGIN:OnKilled( target, dmg )
             if( Arena:containsVal(Arena.playerList, victim)) then
                 -- the player was killed in the arena so remove him from the aliveplayers array
                 Arena:removeVal(Arena.alivePlayers, victim)
+                rust.BroadcastChat("Arena", victim.displayName .. " died in the arena...")
                 -- not working with suicide
                 rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.playerName)
                 if(#Arena.alivePlayers == 1) then
                     timer.Once(15, function()
                     message = "Arena Winner: " .. playerattacker
                     rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-                    
+                    rust.BroadcastChat("Arena", playerattacker .. " wins!")
                     -- kill this person, or teleport them lol
                     timer.Once(15, function()
-                    local isAPlayer = Arena:containsVal(Arena.playerList, player)
+                    local isAPlayer = Arena:containsVal(Arena.playerList, player.netUser)
 		            if(isAPlayer) then
 		           -- clear the inventory before teleporting
 		                Arena:clearInventory( player ) 
-                        local originalLocation = Arena.playerOriLoc[player]
-                        rust.ServerManagement():TeleportPlayer(player, originalLocation)
+                        local originalLocation = Arena.playerOriLoc[player.netUser]
+                        rust.ServerManagement():TeleportPlayer(player.netPlayer, originalLocation)
                         end
                     end)
                     Arena:stopArena()
@@ -244,6 +246,7 @@ function PLUGIN:OnKilled( target, dmg )
                     timer.Once(15, function()
                     message = "Arena Finished (everyone died)"
                     rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+                    rust.BroadcastChat("Arena", "No winner... everyone died.")
                     Arena:stopArena()
                     end)
                 end
