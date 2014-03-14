@@ -191,6 +191,7 @@ function PLUGIN:OnSpawn ( playerClient, useCamp, avatar )
     timer.Once(0, function()
         local isAPlayer = Arena:containsVal(Arena.playerList, playerClient.netUser)
         if(isAPlayer)
+          then
             local originalLocation = Arena.playerOriLoc[isAPlayer]
             rust.ServerManagement():TeleportPlayer(playerClient.netPlayer, originalLocation)
         end
@@ -220,6 +221,7 @@ function PLUGIN:OnKilled( target, dmg )
                       timer.Once(15, function()
                       local isAPlayer = Arena:containsVal(Arena.playerList, player)
 		         if(isAPlayer)
+		          then
 		           -- clear the inventory before teleporting
 		           Arena:clearInventory( player ) 
                            local originalLocation = Arena.playerOriLoc[isAPlayer]
