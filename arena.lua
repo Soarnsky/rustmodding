@@ -141,7 +141,7 @@ function PLUGIN:givePlayerKits()
             local pref = rust.InventorySlotPreference( InventorySlotKind.Belt, false, InventorySlotKindFlags.Belt)
             local item = KL[k+2][2]
             local amt = KL[k+2][1]
-            inv:AddItemAmount( item, amount, pref )
+            inv:AddItemAmount( item, amt, pref )
 
         end
     end
