@@ -43,6 +43,7 @@ function PLUGIN:cmdStartArena( netuser )
     elseif (not Arena.isOn) then
         Arena.isOn = true
         Arena.playerList = {}
+        Arena.alivePlayers = {}
         Arena.playerOriLoc = {}
         message = "Arena starts in " .. Arena.Config.startDelay/60 ..
                   " min! Type /join to join ( BEWARE -- your inventory will be cleared )"
@@ -212,6 +213,45 @@ function PLUGIN:OnSpawnPlayer( playerClient, useCamp, avatar )
             Arena:removeVal(Arena.playerOriLoc, player)
         end
     end)
+end
+
+-- if someone were to disconnect we need to remove them from the lists
+function PLUGIN:OnUserDiscconnect(netPlayer)
+    if(Arena.isOn== true and Arena.playing== true) then
+        local netuser = rust.NetUserFromNetPlayer(netPlayer)
+        if(Arena:containsVal(Arena.playerList, netuser)
+            then
+            Arena:removeVal(Arena.playerList, netuser)
+            Arena:removeVal(Arena.alivePlayers, netuser)
+            rust.BroadcastChat("Arena", netUser.displayName .. " has left the arena... ")
+            
+            if(#Arena.alivePlayers == 1) then
+                    timer.Once(15, function()
+                    message = "Arena Winner: " .. Arena.alivePlayers[1]
+                    rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+
+                    -- kill this person, or teleport them lol
+                    local isAPlayer = Arena:containsVal(Arena.playerList, netuser)
+		            if(isAPlayer) then
+		           -- clear the inventory before teleporting
+		                Arena:clearInventory( netuser ) 
+                        local originalLocation = Arena.playerOriLoc[netuser]
+                        rust.ServerManagement():TeleportPlayer(netPlayer, originalLocation)
+                        end
+                    end)
+                    Arena:stopArena()
+                elseif(#Arena.alivePlayers == 0) then
+                    timer.Once(15, function()
+                    message = "Arena Finished (everyone died)"
+                    rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+                    rust.BroadcastChat("Arena", "No winner... everyone died.")
+                    Arena:stopArena()
+                    end)
+                end
+            
+        end
+        
+    end
 end
 
 -- called when someone is killed
