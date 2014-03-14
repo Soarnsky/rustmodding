@@ -109,7 +109,7 @@ function PLUGIN:cmdJoin( netuser )
         local oldCoords = netuser.playerClient.lastKnownPosition
         local newCoords = netuser.playerClient.lastKnownPosition
         -- add to an array to teleport them back later !
-        oldCoords.y = oldCoords.y + 5
+        oldCoords.y = oldCoords.y + 3
         Arena.playerOriLoc[netuser] = oldCoords
         newCoords.x = Arena.Config.arenaX --Xcoordinates arena
         newCoords.y = Arena.Config.arenaY --Ycoordinates arena
