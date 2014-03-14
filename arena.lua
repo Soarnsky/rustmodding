@@ -13,7 +13,7 @@ PLUGIN.kitToUse        = 1
 PLUGIN.theKits         = {}
 PLUGIN.theKits[1]      = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
 PLUGIN.theKits[2]      = { "Bows" , { 50, "Arrow"}, { 1, "Hunting Bow"}, { 1, "Large Medkit"} }
-PLUGIN.theKits[3]      = { "Millitary" , { 199, "9mm Ammo"}, { 1, "MP54A"}, { 5, "Large Medkit"}, { 2, "F1 Grenade"}, { 1, "Kevlar Vest"} }
+PLUGIN.theKits[3]      = { "Military" , { 199, "9mm Ammo"}, { 1, "MP54A"}, { 5, "Large Medkit"}, { 1, "Kevlar Vest"} }
 
 -- Initializes the plugin
 function PLUGIN:Init()
@@ -135,12 +135,12 @@ function PLUGIN:givePlayerKits()
     local PL = Arena.playerList
     local KL = Arena.theKits[Arena.kitToUse]
     for p=1,#Arena.playerList do
+        inv = rust.GetInventory(PL[p])
         for k=1, (#Arena.theKits[Arena.kitToUse])-1 do
-        --[[print((#Arena.theKits[Arena.kitToUse])-1 )
-        print(PL[p].displayName)
-        print(KL[k+1][2])
-        rust.RunServerCommand("inv.giveplayer ".. PL[p].displayName .. " " .. KL[k+1][2] .. " " .. KL[k+1][1])]]
-        rust.RunServerCommand('inv.giveplayer "'.. PL[p].displayName .. '" "' .. KL[k+1][2] .. '" "' .. KL[k+1][1] .. '"')
+            local pref = rust.InventorySlotPreference( InventorySlotKind.Belt, false, InventorySlotKindFlags.Belt)
+            local item = KL[k+2][2]
+            local amt = KL[k+2][1]
+            inv:AddItemAmount( item, amount, pref )
         end
     end
 end
@@ -184,7 +184,7 @@ function PLUGIN:containsVal(t, val)
 	return false
 end
 
--- Removes a value from an array
+-- Removes a value from a table
 function PLUGIN:removeVal(t, val)
     for i,v in ipairs(t) do
 		if (v == val) then
