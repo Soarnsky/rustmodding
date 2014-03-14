@@ -138,8 +138,12 @@ function PLUGIN:givePlayerKits()
     for p=1,#Arena.playerList do
         inv = rust.GetInventory(PL[p])
         for k=1, (#Arena.theKits[Arena.kitToUse])-1 do
-            local pref = rust.InventorySlotPreference( InventorySlotKind.Belt, false, InventorySlotKindFlags.Belt)
             local item = rust.GetDatablockByName(KL[k+2][2])
+            local pref = rust.InventorySlotPreference( InventorySlotKind.Belt, false, InventorySlotKindFlags.Belt)
+            if(KL[k+2][2].find("Ammo") or KL[k+2][2].find("Shell") or KL[k+2][2].find("Arrow")) 
+            	then
+            	   pref = rust.InventorySlotPreference( InventorySlotKind.Default, false, InventorySlotKindFlags.Belt)
+            	end
             local amt = KL[k+2][1]
             inv:AddItemAmount( item, amt, pref )
         end
@@ -225,7 +229,7 @@ function PLUGIN:OnKilled( target, dmg )
                 Arena:removeVal(Arena.alivePlayers, victim)
                 rust.BroadcastChat("Arena", victim.displayName .. " died in the arena...")
                 -- not working with suicide
-                rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.playerName)
+                rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.displayName)
                 if(#Arena.alivePlayers == 1) then
                     timer.Once(15, function()
                     message = "Arena Winner: " .. playerattacker
