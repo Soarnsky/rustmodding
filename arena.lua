@@ -42,21 +42,21 @@ function PLUGIN:cmdStartArena( netuser )
     else
         Arena.isOn = true
         Arena.playerList = {}
-        message = "Arena starts in" .. Arena.Config.startDelay .. "sec (" .. Arena.Config.startDelay/60 ..
-                  "min)! Type /join to join ( BEWARE -- your inventory will be cleared )"
+        message = "Arena starts in " .. Arena.Config.startDelay/60 ..
+                  " min! Type /join to join ( BEWARE -- your inventory will be cleared )"
         -- message = "Arena starts in 2 min"
         rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
         --Timer is split equally into 3 parts
         --First notification
         timer.Once(Arena.Config.startDelay/3, function()
-        message = "Arena will start in" .. (((Arena.Config.startDelay/60)/3)*2) .. " mins !"
+        message = "Arena will start in " .. (((Arena.Config.startDelay/60)/3)*2) .. " min!"
         --message = "Arena starts in 1 min"
         if Arena.isOn then 
             rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
         else return end
         --Second notification
         timer.Once((Arena.Config.startDelay/3)-Arena.Config.setupDelay, function()
-      	message = "Arena will start in" ..((Arena.Config.startDelay/60)/3).. " mins !"
+      	message = "Arena will start in " .. ((Arena.Config.startDelay/60)/3) .. " min!"
         --message = "Arena blah mins"
         if Arena.isOn then
             rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
