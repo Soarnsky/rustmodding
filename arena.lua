@@ -195,7 +195,7 @@ function PLUGIN:OnSpawn ( playerClient, useCamp, avatar )
             local originalLocation = Arena.playerOriLoc[isAPlayer]
             rust.ServerManagement():TeleportPlayer(playerClient.netPlayer, originalLocation)
         end
-    end
+    end)
 end
 -- called when someone is killed
 function PLUGIN:OnKilled( target, dmg )
