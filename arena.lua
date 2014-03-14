@@ -20,6 +20,7 @@ function PLUGIN:Init()
     Arena = self
     Arena.LoadConfig()
     Arena.isOn = false
+    Arena.kitToUse = Arena.Config.kitToUse
     Arena:AddChatCommand( "startarena", Arena.cmdStartArena )
     Arena:AddChatCommand( "stoparena", Arena.cmdStopArena )
     Arena:AddChatCommand( "join", Arena.cmdJoin )
@@ -66,7 +67,7 @@ function PLUGIN:cmdStartArena( netuser )
         else return end
         --Distribute kits
         timer.Once(Arena.Config.setupDelay/2, function()       
-        message = "Handing out your weapons..."
+        message = "Handing out your " ..  Arena.theKits[Arena.kitToUse][1] .. " weapon kit..."
         if Arena.isOn then
             rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
         else return end
