@@ -139,10 +139,9 @@ function PLUGIN:givePlayerKits()
         inv = rust.GetInventory(PL[p])
         for k=1, (#Arena.theKits[Arena.kitToUse])-1 do
             local pref = rust.InventorySlotPreference( InventorySlotKind.Belt, false, InventorySlotKindFlags.Belt)
-            local item = KL[k+2][2]
+            local item = rust.GetDatablockByName(KL[k+2][2])
             local amt = KL[k+2][1]
             inv:AddItemAmount( item, amt, pref )
-
         end
     end
 end
