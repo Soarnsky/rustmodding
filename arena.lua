@@ -40,9 +40,10 @@ end
 function PLUGIN:cmdStartArena( netuser )
     if ( not(netuser:CanAdmin()) ) then
         rust.Notice( netuser, "Only admins can do this!" )
-    else
+    elseif (not Arena.isOn) then
         Arena.isOn = true
         Arena.playerList = {}
+        Arena.playerOriLoc = {}
         message = "Arena starts in " .. Arena.Config.startDelay/60 ..
                   " min! Type /join to join ( BEWARE -- your inventory will be cleared )"
         -- message = "Arena starts in 2 min"
@@ -93,17 +94,25 @@ function PLUGIN:cmdStopArena( netuser )
     return
 end
 
+--for function calls, not chat command
+function PLUGIN:stopArena()
+        Arena.isOn = false
+        Arena.playing = false
+    return
+end
+
 function PLUGIN:cmdJoin( netuser )
     if (Arena.isOn == true and Arena.playing == false) then
         Arena:clearInventory(netuser)
-        local coords = netuser.playerClient.lastKnownPosition
+        --need both oldCoords and newCoords
+        local oldCoords = netuser.playerClient.lastKnownPosition
+        local newCoords = netuser.playerClient.lastKnownPosition
         -- add to an array to teleport them back later !
-        table.insert ( Arena.playerOriLoc, coords) 
-        
-        coords.x = Arena.Config.arenaX --Xcoordinates arena
-        coords.y = Arena.Config.arenaY --Ycoordinates arena
-        coords.z = Arena.Config.arenaZ --Zcoordinates arena
-        rust.ServerManagement():TeleportPlayer(netuser.playerClient.netPlayer, coords)
+        Arena.playerOriLoc[netuser] = oldCoords
+        newCoords.x = Arena.Config.arenaX --Xcoordinates arena
+        newCoords.y = Arena.Config.arenaY --Ycoordinates arena
+        newCoords.z = Arena.Config.arenaZ --Zcoordinates arena
+        rust.ServerManagement():TeleportPlayer(netuser.playerClient.netPlayer, newCoords)
         table.insert( Arena.playerList, netuser )
         table.insert( Arena.alivePlayers, netuser )
     else rust.Notice(netuser, "Arena is closed!") end
@@ -164,7 +173,6 @@ end
 -- Called when the server is initialized
 function PLUGIN:OnServerInitialized()
     print(Arena.Title .. " v" .. Arena.Version .. " loaded!")
-    print((Arena.Config.startDelay/60)/3)
 end
 
 -- Tests if a value is contained in a table
@@ -187,16 +195,19 @@ function PLUGIN:removeVal(t, val)
 	  return false
 end
 -- called when they first spawn
-function PLUGIN:OnSpawn ( playerClient, useCamp, avatar )
+function PLUGIN:OnSpawnPlayer( playerClient, useCamp, avatar )
     timer.Once(0, function()
-        local isAPlayer = Arena:containsVal(Arena.playerList, playerClient.netUser)
+        local player = playerClient.netUser
+        local isAPlayer = Arena:containsVal(Arena.playerList, player)
         if(isAPlayer)
-          then
-            local originalLocation = Arena.playerOriLoc[isAPlayer]
+        then
+            local originalLocation = Arena.playerOriLoc[player]
             rust.ServerManagement():TeleportPlayer(playerClient.netPlayer, originalLocation)
+            originalLocation = nil
         end
     end)
 end
+
 -- called when someone is killed
 function PLUGIN:OnKilled( target, dmg )
     if(Arena.isOn== true and Arena.playing== true) then
@@ -218,23 +229,22 @@ function PLUGIN:OnKilled( target, dmg )
                     rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
                     
                     -- kill this person, or teleport them lol
-                      timer.Once(15, function()
-                      local isAPlayer = Arena:containsVal(Arena.playerList, player)
-		         if(isAPlayer)
-		          then
+                    timer.Once(15, function()
+                    local isAPlayer = Arena:containsVal(Arena.playerList, player)
+		            if(isAPlayer) then
 		           -- clear the inventory before teleporting
-		           Arena:clearInventory( player ) 
-                           local originalLocation = Arena.playerOriLoc[isAPlayer]
-                           rust.ServerManagement():TeleportPlayer(player, originalLocation)
-                         end
-                       end)
-                       Arena:cmdStopArena()
+		                Arena:clearInventory( player ) 
+                        local originalLocation = Arena.playerOriLoc[player]
+                        rust.ServerManagement():TeleportPlayer(player, originalLocation)
+                        end
+                    end)
+                    Arena:stopArena()
                     end)
                 elseif(#Arena.alivePlayers == 0) then
                     timer.Once(15, function()
                     message = "Arena Finished (everyone died)"
                     rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-                    Arena:cmdStopArena()
+                    Arena:stopArena()
                     end)
                 end
             end
