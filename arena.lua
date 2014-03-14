@@ -4,6 +4,7 @@ PLUGIN.Author          = "Kitboga, Soarnsky"
 PLUGIN.Version         = "1.11 Alpha"
 
 PLUGIN.playerList      = {}
+PLUGIN.playerOriLoc    = {}
 PLUGIN.alivePlayers    = {}
 PLUGIN.isOn            = false
 PLUGIN.playing         = false
@@ -96,6 +97,9 @@ function PLUGIN:cmdJoin( netuser )
     if (Arena.isOn == true and Arena.playing == false) then
         Arena:clearInventory(netuser)
         local coords = netuser.playerClient.lastKnownPosition
+        -- add to an array to teleport them back later !
+        table.insert ( Arena.playerOriLoc, coords) 
+        
         coords.x = Arena.Config.arenaX --Xcoordinates arena
         coords.y = Arena.Config.arenaY --Ycoordinates arena
         coords.z = Arena.Config.arenaZ --Zcoordinates arena
@@ -147,7 +151,7 @@ function PLUGIN:cmdArena( netuser )
             players = players .. Arena.playerList[i].displayName .. "."
         end
     end
-    rust.SendChatToUser( netuser, players)	  
+    rust.SendChatToUser( netuser, players)	 
 end
 
 function PLUGIN:cmdAHELP( netuser )
@@ -165,8 +169,8 @@ end
 
 -- Tests if a value is contained in a table
 function PLUGIN:containsVal(t, val)
-	  for _,v in ipairs(t) do
-		    if (v == val) then return true end
+	  for i,v in ipairs(t) do
+		    if (v == val) then return i end
 	  end
 	  return false
 end
@@ -182,7 +186,16 @@ function PLUGIN:removeVal(t, val)
 	  end
 	  return false
 end
-
+-- called when they first spawn
+function PLUGIN:OnSpawn ( playerClient, useCamp, avatar )
+    timer.Once(0, function()
+        local isAPlayer = Arena:containsVal(Arena.playerList, playerClient.netUser)
+        if(isAPlayer)
+            local originalLocation = Arena.playerOriLoc[isAPlayer]
+            rust.ServerManagement():TeleportPlayer(playerClient.netPlayer, originalLocation)
+        end
+    end
+end
 -- called when someone is killed
 function PLUGIN:OnKilled( target, dmg )
     if(Arena.isOn== true and Arena.playing== true) then
@@ -198,13 +211,22 @@ function PLUGIN:OnKilled( target, dmg )
                 Arena:removeVal(Arena.alivePlayers, victim)
                 -- not working with suicide
                 rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.playerName)
-                if(#Arena.alivePlayers ~= 1) then
-                    rust.BroadcastChat("Arena", #Arena.alivePlayers .. " players left in the Arena")
-                elseif(#Arena.alivePlayers == 1) then
+                if(#Arena.alivePlayers == 1) then
                     timer.Once(15, function()
                     message = "Arena Winner: " .. playerattacker
                     rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-                    Arena:cmdStopArena()
+                    
+                    -- kill this person, or teleport them lol
+                      timer.Once(15, function()
+                      local isAPlayer = Arena:containsVal(Arena.playerList, player)
+		         if(isAPlayer)
+		           -- clear the inventory before teleporting
+		           Arena:clearInventory( player ) 
+                           local originalLocation = Arena.playerOriLoc[isAPlayer]
+                           rust.ServerManagement():TeleportPlayer(player, originalLocation)
+                         end
+                       end)
+                       Arena:cmdStopArena()
                     end)
                 elseif(#Arena.alivePlayers == 0) then
                     timer.Once(15, function()
