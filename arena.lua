@@ -11,9 +11,9 @@ PLUGIN.playing         = false
 
 PLUGIN.kitToUse        = 1
 PLUGIN.theKits         = {}
-PLUGIN.theKits[1]      = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
-PLUGIN.theKits[2]      = { "Bows" , { 50, "Arrow"}, { 1, "Hunting Bow"}, { 1, "Large Medkit"} }
-PLUGIN.theKits[3]      = { "Military" , { 199, "9mm Ammo"}, { 1, "MP5A4"}, { 5, "Large Medkit"}, { 1, "Kevlar Helmet"}, { 1, "Kevlar Vest"}, { 1, "Kevlar Pants"}, { 1, "Kevlar Boots"} }
+--PLUGIN.theKits[1]      = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
+--PLUGIN.theKits[2]      = { "Bows" , { 50, "Arrow"}, { 1, "Hunting Bow"}, { 1, "Large Medkit"} }
+--PLUGIN.theKits[3]      = { "Military" , { 199, "9mm Ammo"}, { 1, "MP5A4"}, { 5, "Large Medkit"}, { 1, "Kevlar Helmet"}, { 1, "Kevlar Vest"}, { 1, "Kevlar Pants"}, { 1, "Kevlar Boots"} }
 
 -- Initializes the plugin
 function PLUGIN:Init()
@@ -27,6 +27,7 @@ function PLUGIN:Init()
     Arena:AddChatCommand( "coord", Arena.cmdCoord )
     Arena:AddChatCommand( "arena", Arena.cmdArena )
     Arena:AddChatCommand( "ahelp", Arena.cmdAHELP )
+    Arena:AddChatCommand( "setkit", Arena.cmdSetKit )
 end
 
 function PLUGIN:LoadConfig()
@@ -94,6 +95,20 @@ function PLUGIN:cmdStopArena( netuser )
         rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
     end 
     return
+end
+
+-- to set commands
+function PLUGIN:cmdSetKit( netuser, cmd, args )
+    if ( not(netuser:CanAdmin()) ) then
+        rust.Notice( netuser, "Only admins can do this!" )
+    else
+      if(args[1])
+    	then 
+    	Arena.kitToUse = args[1]
+      else
+    	rust.Notice( netuser, "setkit num" )	
+      end
+    end
 end
 
 --for function calls, not chat command
