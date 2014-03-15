@@ -13,7 +13,7 @@ PLUGIN.kitToUse        = 1
 PLUGIN.theKits         = {}
 PLUGIN.theKits[1]      = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
 PLUGIN.theKits[2]      = { "Bows" , { 50, "Arrow"}, { 1, "Hunting Bow"}, { 1, "Large Medkit"} }
-PLUGIN.theKits[3]      = { "Military" , { 199, "9mm Ammo"}, { 1, "MP5A4"}, { 5, "Large Medkit"}, { 1, "Kevlar Vest"} }
+PLUGIN.theKits[3]      = { "Military" , { 199, "9mm Ammo"}, { 1, "MP5A4"}, { 5, "Large Medkit"}, { 1, "Kevlar Helmet"}, { 1, "Kevlar Vest"}, { 1, "Kevlar Pants"}, { 1, "Kevlar Boots"} }
 
 -- Initializes the plugin
 function PLUGIN:Init()
@@ -110,7 +110,7 @@ function PLUGIN:cmdJoin( netuser )
         local oldCoords = netuser.playerClient.lastKnownPosition
         local newCoords = netuser.playerClient.lastKnownPosition
         -- add to an array to teleport them back later !
-        oldCoords.y = oldCoords.y + 3
+        oldCoords.y = oldCoords.y + 2
         Arena.playerOriLoc[netuser] = oldCoords
         newCoords.x = Arena.Config.arenaX --Xcoordinates arena
         newCoords.y = Arena.Config.arenaY --Ycoordinates arena
@@ -164,15 +164,19 @@ end
 
 function PLUGIN:cmdArena( netuser )
     local players = ""
-    rust.SendChatToUser( netuser, #Arena.playerList .. " participant(s):" )
-	for i in ipairs(Arena.playerList) do
-        if (i%5 ~= 0 and i ~= #Arena.playerList) then
-            players = players .. Arena.playerList[i].displayName .. ", "
-        elseif (i == #Arena.playerList) then
-            players = players .. Arena.playerList[i].displayName .. "."
+    if Arena.isOn then
+        rust.SendChatToUser( netuser, #Arena.playerList .. " participant(s):" )
+	    for i in ipairs(Arena.playerList) do
+            if (i%5 ~= 0 and i ~= #Arena.playerList) then
+                players = players .. Arena.playerList[i].displayName .. ", "
+            elseif (i == #Arena.playerList) then
+                players = players .. Arena.playerList[i].displayName .. "."
+            end
         end
+        rust.SendChatToUser( netuser, players)
+    else
+        rust.Notice( netuser, "Arena is closed!")
     end
-    rust.SendChatToUser( netuser, players)	 
 end
 
 function PLUGIN:cmdAHELP( netuser )
@@ -261,7 +265,7 @@ end
 
 -- called when someone is killed
 function PLUGIN:OnKilled( target, dmg )
-    if(Arena.isOn== true and Arena.playing== true) then
+    if(Arena.isOn and Arena.playing) then
         if(dmg.attacker and dmg.attacker.client ) then
             local player = dmg.attacker.client
             local playerattacker = player.netUser.displayName
