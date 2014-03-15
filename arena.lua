@@ -103,12 +103,13 @@ function PLUGIN:cmdSetKit( netuser, cmd, args )
     if ( not(netuser:CanAdmin()) ) then
         rust.Notice( netuser, "Only admins can do this!" )
     else
-      if(args[1])
-    	then 
-    	Arena.kitToUse = args[1]
-      else
-    	rust.Notice( netuser, "setkit num" )	
-      end
+        if(args[1])
+        then 
+    	    Arena.kitToUse = args[1]
+            rust.Notice( netuser, "Kit Set: " .. Arena.theKits[args[1]][1])
+        else
+    	    rust.Notice( netuser, "setkit num" )	
+        end
     end
 end
 
