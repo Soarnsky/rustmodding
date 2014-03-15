@@ -121,7 +121,7 @@ function PLUGIN:stopArena()
 end
 
 function PLUGIN:cmdJoin( netuser )
-    if (Arena.isOn == true and Arena.playing == false) then
+    if (Arena.isOn == true and Arena.playing == false and not(Arena:containsVal(Arena.playerList, netuser))) then
         Arena:clearInventory(netuser)
         --need both oldCoords and newCoords
         local oldCoords = netuser.playerClient.lastKnownPosition
@@ -226,6 +226,14 @@ function PLUGIN:removeVal(t, val)
 	end
 	return false
 end
+
+function PLUGIN:unpack (t, i)
+    i = i or 1
+    if t[i] ~= nil then
+        return t[i], Arena:unpack(t, i + 1)
+    end
+end
+
 -- called when they first spawn
 function PLUGIN:OnSpawnPlayer( playerClient, useCamp, avatar )
     timer.Once(0, function()
@@ -263,20 +271,18 @@ function PLUGIN:OnUserDisconnect(netPlayer)
 		                Arena:clearInventory( netuser ) 
                         local originalLocation = Arena.playerOriLoc[netuser]
                         rust.ServerManagement():TeleportPlayer(netPlayer, originalLocation)
-                        end
+                    end
                     end)
                     Arena:stopArena()
-                elseif(#Arena.alivePlayers == 0) then
-                    timer.Once(15, function()
-                    message = "Arena Finished (everyone died)"
-                    rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-                    rust.BroadcastChat("Arena", "No winner... everyone died.")
-                    Arena:stopArena()
-                    end)
-                end
-            
-        end
-        
+            elseif(#Arena.alivePlayers == 0) then
+                timer.Once(15, function()
+                message = "Arena Finished (everyone died)"
+                rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
+                rust.BroadcastChat("Arena", "No winner... everyone died.")
+                Arena:stopArena()
+                end)
+            end
+        end 
     end
 end
 
@@ -299,17 +305,17 @@ function PLUGIN:OnKilled( target, dmg )
                 rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.displayName)
                 if(#Arena.alivePlayers == 1) then
                     timer.Once(15, function()
-                    local winner = Arena.alivePlayers[1]
-                    message = "Arena Winner: " .. winner
+                    local winner = Arena:unpack(Arena.alivePlayers)
+                    message = "Arena Winner: " .. winner.displayName
                     rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-                    rust.BroadcastChat("Arena", winner .. " wins!")
+                    rust.BroadcastChat("Arena", winner.displayName .. " wins!")
                     -- kill this person, or teleport them lol
-                    local isAPlayer = Arena:containsVal(Arena.playerList, player.netUser)
+                    local isAPlayer = Arena:containsVal(Arena.playerList, winner)
 		            if(isAPlayer) then
 		           -- clear the inventory before teleporting
 		                Arena:clearInventory( winner ) 
                         local originalLocation = Arena.playerOriLoc[winner]
-                        rust.ServerManagement():TeleportPlayer(winner, originalLocation)
+                        rust.ServerManagement():TeleportPlayer(winner.playerClient.netPlayer, originalLocation)
                         if( Arena:containsVal(Arena.alivePlayers, winner)) then
                             Arena:removeVal(Arena.alivePlayers, winner)
                         end
@@ -335,8 +341,8 @@ function PLUGIN:SendHelpText( netuser )
 end
 
 function PLUGIN:LoadDefaultConfig()
-    Arena.Config.startDelay = 30.00
-    Arena.Config.setupDelay = 30.00
+    Arena.Config.startDelay = 60.00
+    Arena.Config.setupDelay = 10.00
     Arena.Config.arenaX = 3440.619628903
     Arena.Config.arenaY = 353.20803833008
     Arena.Config.arenaZ = 1167.337890625
@@ -344,5 +350,5 @@ function PLUGIN:LoadDefaultConfig()
     Arena.Config.theKits[1]      = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
     Arena.Config.theKits[2]      = { "Bows" , { 50, "Arrow"}, { 1, "Hunting Bow"}, { 1, "Large Medkit"} }
     Arena.Config.theKits[3]      = { "Military" , { 199, "9mm Ammo"}, { 1, "MP5A4"}, { 5, "Large Medkit"}, { 1, "Kevlar Helmet"}, { 1, "Kevlar Vest"}, { 1, "Kevlar Pants"}, { 1, "Kevlar Boots"} }
-
+    Arena.Config.kitToUse = 3
 end
