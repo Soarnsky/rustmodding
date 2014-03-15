@@ -339,4 +339,9 @@ function PLUGIN:LoadDefaultConfig()
     Arena.Config.arenaX = 3440.619628903
     Arena.Config.arenaY = 353.20803833008
     Arena.Config.arenaZ = 1167.337890625
+    Arena.Config.theKits         = {}
+    Arena.Config.theKits[1]      = { "Pistols" , { 99, "9mm Ammo"}, { 1, "9mm Pistol"}, { 5, "Large Medkit"} }
+    Arena.Config.theKits[2]      = { "Bows" , { 50, "Arrow"}, { 1, "Hunting Bow"}, { 1, "Large Medkit"} }
+    Arena.Config.theKits[3]      = { "Military" , { 199, "9mm Ammo"}, { 1, "MP5A4"}, { 5, "Large Medkit"}, { 1, "Kevlar Helmet"}, { 1, "Kevlar Vest"}, { 1, "Kevlar Pants"}, { 1, "Kevlar Boots"} }
+
 end
