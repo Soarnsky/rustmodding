@@ -105,7 +105,7 @@ function PLUGIN:cmdSetKit( netuser, cmd, args )
     else
         if(args[1])
         then 
-    	    Arena.kitToUse = args[1]
+    	    Arena.kitToUse = tonumber(args[1])
             rust.Notice( netuser, "Kit Set: " .. Arena.theKits[tonumber(Arena.kitToUse)][1])
         else
     	    rust.Notice( netuser, "setkit num" )	
