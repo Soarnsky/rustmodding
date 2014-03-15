@@ -21,6 +21,7 @@ function PLUGIN:Init()
     Arena.LoadConfig()
     Arena.isOn = false
     Arena.kitToUse = Arena.Config.kitToUse
+    Arena.theKits = Arena.Config.theKits
     Arena:AddChatCommand( "startarena", Arena.cmdStartArena )
     Arena:AddChatCommand( "stoparena", Arena.cmdStopArena )
     Arena:AddChatCommand( "join", Arena.cmdJoin )
