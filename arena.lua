@@ -333,7 +333,7 @@ function PLUGIN:SendHelpText( netuser )
 end
 
 function PLUGIN:LoadDefaultConfig()
-    Arena.Config.startDelay = 300.00
+    Arena.Config.startDelay = 30.00
     Arena.Config.setupDelay = 30.00
     Arena.Config.arenaX = 3440.619628903
     Arena.Config.arenaY = 353.20803833008
