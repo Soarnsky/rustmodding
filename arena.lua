@@ -299,20 +299,21 @@ function PLUGIN:OnKilled( target, dmg )
                 rust.BroadcastChat("Arena", playerattacker .. " has slain " .. victim.displayName)
                 if(#Arena.alivePlayers == 1) then
                     timer.Once(15, function()
-                    message = "Arena Winner: " .. playerattacker
+                    local winner = Arena.alivePlayers[1]
+                    message = "Arena Winner: " .. winner
                     rust.RunServerCommand("notice.popupall \"" .. message .. "\"")
-                    rust.BroadcastChat("Arena", playerattacker .. " wins!")
+                    rust.BroadcastChat("Arena", winner .. " wins!")
                     -- kill this person, or teleport them lol
                     local isAPlayer = Arena:containsVal(Arena.playerList, player.netUser)
 		            if(isAPlayer) then
 		           -- clear the inventory before teleporting
-		                Arena:clearInventory( player.netUser ) 
-                        local originalLocation = Arena.playerOriLoc[player.netUser]
-                        rust.ServerManagement():TeleportPlayer(player.netPlayer, originalLocation)
-                        if( Arena:containsVal(Arena.alivePlayers, player.netUser)) then
-                            Arena:removeVal(Arena.alivePlayers, player.netUser)
+		                Arena:clearInventory( winner ) 
+                        local originalLocation = Arena.playerOriLoc[winner]
+                        rust.ServerManagement():TeleportPlayer(winner, originalLocation)
+                        if( Arena:containsVal(Arena.alivePlayers, winner)) then
+                            Arena:removeVal(Arena.alivePlayers, winner)
                         end
-                        Arena:removeVal(Arena.playerList, player.netUser)
+                        Arena:removeVal(Arena.playerList, winner)
                     end
                     end)
                     Arena:stopArena()
